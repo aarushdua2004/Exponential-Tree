@@ -8,11 +8,6 @@ Some properties of them are mentioned below:
 * All the keys in any node will be sorted. 
 This modified version of exponential trees is similar to binary trees with the difference that the number of children that a node can hold depends on the depth of the node increases exponentially.  
 
-
-## Team Members 
-Naviket Mankoo- 2021MCB1248  
-Subham-2021CMCB1248  
-Akshit Singh-2021MCB1229
 ## Deployment
 
 To run this project in the windows terminal,
