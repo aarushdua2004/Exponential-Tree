@@ -1,12 +1,3 @@
-/*
-Group-2
-Naviket Mankoo -> 2021MCB1239
-Subham -> 2021MCB1248
-Akshit Singh -> 2021MCB1229
-
-Topic -Exponential Trees
-Aim - Comparing the sorting time and analysis among exponential trees, binary trees and quick sort algorithm
-*/
 #include <stdio.h>  //importing the basic library of c
 #include <stdlib.h> //importing the standard library of c
 #include <string.h> //importing the string library
