@@ -3,13 +3,13 @@
 #include <string.h> //importing the string library
 #include <time.h>   // importing the time library for calculating the time of functions
 
-clock_t e_time; // intitalising the time variables for exponential tree
-clock_t b_time; // intitalising the time variables for binary tree
-clock_t q_time; // intitalising the time variables for quick sort
+clock_t e_time; // initializing the time variables for exponential tree
+clock_t b_time; // initializing the time variables for binary tree
+clock_t m_time; // initializing the time variables for merge sort
 
 typedef struct Node node; // typedefining the node for easier use in the code
 
-int array[5000007]; // declaring the array for quick sort
+int array[5000007]; // declaring the array for merge sort
                     // the array is declared as global to increase the size constraints in local functions
 
 struct Node // creating node for exponential tree
@@ -31,7 +31,7 @@ struct node *newNode(int item)
 {
     struct node *temp = (struct node *)malloc(sizeof(struct node)); // allocating the memory for the node in the heap
     temp->key = item;                                               // giving the data
-    temp->left = temp->right = NULL;                                // initialising the children of the node
+    temp->left = temp->right = NULL;                                // initializing the children of the node
     return temp;                                                    // returning the node
 }
 
@@ -69,7 +69,7 @@ struct node *insert1(struct node *node, int key)
     return node;
 }
 
-/* Utility funcitons  for the exponential trees*/
+/* Utility functions  for the exponential trees*/
 
 /*this function will be used in inserting the node in the exponential tree
 it will find the correct spot for the insertion */
@@ -103,7 +103,7 @@ int binary_search(node *ptr, int element)
     return mid; // return the mid the ultimate answer of search
 }
 
-// funciton for creating the node of the exponential tree
+// function for creating the node of the exponential tree
 // this function will be used when we have found the correct spot for insertion of the element
 // then we will create the node and insert it at the position
 node *createNode(const int level) // the level signifies the level from the root of the tree , root has level 1
@@ -142,7 +142,7 @@ void insert(node *root, int element)
         if (count < (1 << (level - 1))) // only if the count is less than the maximum allowed size of the array
         {
             for (int j = count; j >= i + 1; --j)
-                ptr->data[j] = ptr->data[j - 1]; // shifting the aray elements
+                ptr->data[j] = ptr->data[j - 1]; // shifting the array elements
 
             ptr->data[i] = element; // putting the element at the place
             ++ptr->count;           // increasing the count to +1
@@ -158,7 +158,7 @@ void insert(node *root, int element)
 }
 
 void InOrderTrace(node *root) // performing the inorder trace
-                              // this function only is the funcniton that essentialy performs the sorting
+                              // this function only is the function that essentially performs the sorting
 {
 
     if (root == NULL) // if null terminate
@@ -174,50 +174,74 @@ void InOrderTrace(node *root) // performing the inorder trace
         InOrderTrace(root->child[root->count]);
 }
 
-void swap(int *a, int *b)
+// merge function to merge the sorted halves
+void merge(int arr[], int l, int m, int r)
 {
-    // swapping the elements
-    int t = *a;
-    // using the temporary variable
-    *a = *b;
-    *b = t;
-}
-/* partition function to help in the quick sort funciton
-this function places the pivot at its correct place*/
-int partition(int arr[], int low, int high)
-{
-    int pivot = arr[high];
-    // creating the last element as pivot
-    int i = (low - 1);
+    int i, j, k;
+    int n1 = m - l + 1;
+    int n2 = r - m;
 
-    for (int j = low; j <= high - 1; j++)
+    /* create temp arrays */
+    int L[n1], R[n2];
+
+    /* Copy data to temp arrays L[] and R[] */
+    for (i = 0; i < n1; i++)
+        L[i] = arr[l + i];
+    for (j = 0; j < n2; j++)
+        R[j] = arr[m + 1 + j];
+
+    /* Merge the temp arrays back into arr[l..r]*/
+    i = 0; // Initial index of first subarray
+    j = 0; // Initial index of second subarray
+    k = l; // Initial index of merged subarray
+    while (i < n1 && j < n2)
     {
-
-        if (arr[j] < pivot)
+        if (L[i] <= R[j])
         {
+            arr[k] = L[i];
             i++;
-            swap(&arr[i], &arr[j]); // swapping if condition statisfies
         }
+        else
+        {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
     }
-    swap(&arr[i + 1], &arr[high]);
-    return (i + 1); // return the partition index
-}
 
-void quickSort(int arr[], int low, int high)
-{
-    // performing the quick sort
-    if (low < high)
+    /* Copy the remaining elements of L[], if there are any */
+    while (i < n1)
     {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
 
-        int pi = partition(arr, low, high); // getting the partition
-
-        /* recursively perfioeming the quick sort function on the left and the right side of the array around the partition*/
-        quickSort(arr, low, pi - 1);
-        quickSort(arr, pi + 1, high);
+    /* Copy the remaining elements of R[], if there are any */
+    while (j < n2)
+    {
+        arr[k] = R[j];
+        j++;
+        k++;
     }
 }
 
-// starting of main
+// l is for left index and r is right index of the sub-array of arr to be sorted
+void mergeSort(int arr[], int l, int r)
+{
+    if (l < r)
+    {
+        // Same as (l+r)/2, but avoids overflow for large l and h
+        int m = l + (r - l) / 2;
+
+        // Sort first and second halves
+        mergeSort(arr, l, m);
+        mergeSort(arr, m + 1, r);
+
+        merge(arr, l, m, r);
+    }
+}
+
 int main()
 {
     FILE *file;
@@ -232,7 +256,7 @@ int main()
     // creating the binary tree node
 
     root = insert1(root, 1);
-    // creating thr root for binary tree
+    // creating the root for binary tree
 
     if (file == NULL)
     {
@@ -244,10 +268,10 @@ int main()
 
     int N; // the size of the array in the file
     /* the inputs are taken in a file just to ensure that the set of numbers for both the exponential and the binary tree is same and
-    and also to perform the quick sort, we need to store the elements in the array*/
+    and also to perform the sorting, we need to store the elements in the array*/
 
     fscanf(file, "%d", &N);
-    // scannig the first number which is number of inputs for the array
+    // scanning the first number which is number of inputs for the array
 
     int k;
     e_time = clock(); // starting the clock to measure the time
@@ -270,19 +294,19 @@ int main()
     fclose(file); // closing the file
 
     FILE *file1; // opening the file
-    file1 = fopen("file1", "r");
+    file1 = fopen("input.txt", "r"); // Ensure file1 is opened with the correct file
     int N1;
     int k1;
     b_time = clock();         // opening the clock
     fscanf(file1, "%d", &N1); // scanning the first integer the size
 
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < N1; i++)
     {
         // reading the file
         fscanf(file1, "%d", &k1);
 
-        insert1(root, k);
-        // inserting thr data of file int the tree
+        insert1(root, k1);
+        // inserting the data of file into the tree
     }
 
     inorder(root);
@@ -293,16 +317,16 @@ int main()
 
     fclose(file1);
     // closing the file
+
     FILE *file2;
     file2 = fopen("input.txt", "r");
     // opening the file to scan
     int N2;
     fscanf(file2, "%d", &N2);
     // scanning the file
-    //  int arr[N2];
     int k2;
 
-    q_time = clock();
+    m_time = clock();
     // starting of the clock
     for (int i = 0; i < N2; i++)
     {
@@ -311,16 +335,16 @@ int main()
         array[i] = k2;
     }
 
-    quickSort(array, 0, N2 - 1); // performing the quicksort on input file
-    q_time = clock() - q_time;
-    // stoping the clock
-    double qui_t = (double)q_time / CLOCKS_PER_SEC;
+    mergeSort(array, 0, N2 - 1); // performing the merge sort on input file
+    m_time = clock() - m_time;
+    // stopping the clock
+    double merge_t = (double)m_time / CLOCKS_PER_SEC;
     printf("Expo_tree time is %f\n", exp_t);
-    // printing te time taken by exponential tree
+    // printing the time taken by exponential tree
     printf("Bin_tree time is %f\n", bst_t);
     // printing the time of binary tree
-    printf("Quick_ time is %f\n", qui_t);
-    // printing the time of quick sort algorithm
+    printf("Merge_sort time is %f\n", merge_t);
+    // printing the time of merge sort algorithm
     fclose(file2);
 
     // closing the file at the end of the function
