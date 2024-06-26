@@ -1,135 +1,124 @@
-#include <stdio.h>  //importing the basic library of c
-#include <stdlib.h> //importing the standard library of c
-#include <string.h> //importing the string library
-#include <time.h>   // importing the time library for calculating the time of functions
+#include <stdio.h>  // Importing the basic library of C
+#include <stdlib.h> // Importing the standard library of C
+#include <string.h> // Importing the string library
+#include <time.h>   // Importing the time library for calculating the time of functions
 
-clock_t e_time; // initializing the time variables for exponential tree
-clock_t b_time; // initializing the time variables for binary tree
-clock_t m_time; // initializing the time variables for merge sort
+clock_t e_time; // Initializing the time variables for exponential tree
+clock_t b_time; // Initializing the time variables for binary tree
+clock_t m_time; // Initializing the time variables for merge sort
 
-typedef struct Node node; // typedefining the node for easier use in the code
+typedef struct Node node; // Typedefining the node for easier use in the code
 
-int array[5000007]; // declaring the array for merge sort
-                    // the array is declared as global to increase the size constraints in local functions
+int array[5000007]; // Declaring the array for merge sort
+                    // The array is declared as global to increase the size constraints in local functions
 
-struct Node // creating node for exponential tree
+struct Node // Creating node for exponential tree
 {
-    int level;    // gives the level of the node of the exponential tree
-    int count;    // number of integers present currently in the node
-    node **child; // array for the children of each node pf the tree
-    int data[];   // for every element in the node
+    int level;    // Gives the level of the node of the exponential tree
+    int count;    // Number of integers present currently in the node
+    node **child; // Array for the children of each node of the tree
+    int data[];   // For every element in the node
 };
 
-struct node // creating node for binary tree
+struct node // Creating node for binary tree
 {
-    int key;                   // the data present in the node
-    struct node *left, *right; // the left and right child of the node
+    int key;                   // The data present in the node
+    struct node *left, *right; // The left and right child of the node
 };
 
 // A utility function to create a new BST node
 struct node *newNode(int item)
 {
-    struct node *temp = (struct node *)malloc(sizeof(struct node)); // allocating the memory for the node in the heap
-    temp->key = item;                                               // giving the data
-    temp->left = temp->right = NULL;                                // initializing the children of the node
-    return temp;                                                    // returning the node
+    struct node *temp = (struct node *)malloc(sizeof(struct node)); // Allocating the memory for the node in the heap
+    temp->key = item;                                               // Giving the data
+    temp->left = temp->right = NULL;                                // Initializing the children of the node
+    return temp;                                                    // Returning the node
 }
 
 // A utility function to do inorder traversal of BST
-void inorder(struct node *root) // inorder
+void inorder(struct node *root) // Inorder
 {
     if (root != NULL)
     {
         inorder(root->left);
-        // printf("%d \n", root->key);
-        //here the  data is not printed because we just need to calculate the time the tree takes to sort the data/
         inorder(root->right);
     }
 }
 
-/* A utility function to insert
-   a new node with given key in
-  BST */
+/* A utility function to insert a new node with given key in BST */
 struct node *insert1(struct node *node, int key)
 {
     /* If the tree is empty, return a new node */
     if (node == NULL)
         return newNode(key);
 
-    /*
-    Otherwise, recur down the tree
-    according to the position of the insertion of node
-    */
+    /* Otherwise, recur down the tree according to the position of the insertion of node */
     if (key < node->key)
         node->left = insert1(node->left, key);
     else if (key > node->key)
         node->right = insert1(node->right, key);
 
-    /* returning the head pointer  */
+    /* Returning the head pointer */
     return node;
 }
 
-/* Utility functions  for the exponential trees*/
+/* Utility functions for the exponential trees */
 
-/*this function will be used in inserting the node in the exponential tree
-it will find the correct spot for the insertion */
+/* This function will be used in inserting the node in the exponential tree
+   It will find the correct spot for the insertion */
 int binary_search(node *ptr, int element)
 {
-    if (ptr->count == 0) // if the node is empty then return 0
+    if (ptr->count == 0) // If the node is empty then return 0
         return 0;
     if (element > ptr->data[ptr->count - 1])
-        return ptr->count; // if the element is greater than the biggest element in the array then return the count of the array
+        return ptr->count; // If the element is greater than the biggest element in the array then return the count of the array
 
-    // executing binary search in the individual nodes
+    // Executing binary search in the individual nodes
     int start = 0;
     int end = ptr->count - 1;
     int mid = start + (end - start) / 2;
-    // we mainly divide the array into two parts and check the
+    // We mainly divide the array into two parts and check the
     // first element of both parts of arrays and this works in a loop
-    //  until you reached your element
+    // until you reached your element
     while (start < end)
     {
         if (element > ptr->data[mid])
-
-            start = mid + 1; // mid is made the start
-        // second part of array
+            start = mid + 1; // Mid is made the start (second part of array)
         else
-            end = mid; // mid is made the end of array
-        // first part of array
+            end = mid; // Mid is made the end of array (first part of array)
 
         mid = start + (end - start) / 2;
     }
 
-    return mid; // return the mid the ultimate answer of search
+    return mid; // Return the mid, the ultimate answer of search
 }
 
-// function for creating the node of the exponential tree
-// this function will be used when we have found the correct spot for insertion of the element
-// then we will create the node and insert it at the position
-node *createNode(const int level) // the level signifies the level from the root of the tree , root has level 1
+// Function for creating the node of the exponential tree
+// This function will be used when we have found the correct spot for insertion of the element
+// Then we will create the node and insert it at the position
+node *createNode(const int level) // The level signifies the level from the root of the tree, root has level 1
 {
     if (level <= 0)
         return NULL;
 
     /* Allocate node with 2**(level-1) integers */
-    node *pNewNode = (node *)malloc(sizeof(node) + sizeof(int) * (1 << (level - 1))); // allocating the memory for the integer array
-    memset(pNewNode->data, 0, sizeof(int) * (1 << (level - 1)));                      // this sets the data of the node elements to zero
+    node *pNewNode = (node *)malloc(sizeof(node) + sizeof(int) * (1 << (level - 1))); // Allocating the memory for the integer array
+    memset(pNewNode->data, 0, sizeof(int) * (1 << (level - 1)));                      // This sets the data of the node elements to zero
 
     /* Allocate 2**level child node pointers */
-    pNewNode->child = (node **)malloc(sizeof(node *) * (1 << level)); // allocating the memory for the children of the node
+    pNewNode->child = (node **)malloc(sizeof(node *) * (1 << level)); // Allocating the memory for the children of the node
     memset(pNewNode->child, 0, sizeof(int) * (1 << level));
 
-    pNewNode->count = 0; // currently the number of elements in the node is 0
-
-    pNewNode->level = level; // setting the level to the level mentioned
+    pNewNode->count = 0; // Currently the number of elements in the node is 0
+    pNewNode->level = level; // Setting the level to the level mentioned
 
     return pNewNode;
 }
 
-// function to insert the node at the position
+// Function to insert the node at the position
 void insert(node *root, int element)
 {
-    node *ptr = root; //  for not using the root
+    node *ptr = root; // For not using the root
     node *parent = NULL;
     int i = 0;
 
@@ -137,15 +126,15 @@ void insert(node *root, int element)
     {
         int level = ptr->level;
         int count = ptr->count;
-        i = binary_search(ptr, element); // finding the node in the tree
+        i = binary_search(ptr, element); // Finding the node in the tree
 
-        if (count < (1 << (level - 1))) // only if the count is less than the maximum allowed size of the array
+        if (count < (1 << (level - 1))) // Only if the count is less than the maximum allowed size of the array
         {
             for (int j = count; j >= i + 1; --j)
-                ptr->data[j] = ptr->data[j - 1]; // shifting the array elements
+                ptr->data[j] = ptr->data[j - 1]; // Shifting the array elements
 
-            ptr->data[i] = element; // putting the element at the place
-            ++ptr->count;           // increasing the count to +1
+            ptr->data[i] = element; // Putting the element at the place
+            ++ptr->count;           // Increasing the count to +1
             return;
         }
 
@@ -157,11 +146,9 @@ void insert(node *root, int element)
     insert(parent->child[i], element);
 }
 
-void InOrderTrace(node *root) // performing the inorder trace
-                              // this function only is the function that essentially performs the sorting
+void InOrderTrace(node *root) // Performing the inorder trace
 {
-
-    if (root == NULL) // if null terminate
+    if (root == NULL) // If null terminate
         return;
 
     for (int i = 0; i < root->count; ++i)
@@ -174,15 +161,16 @@ void InOrderTrace(node *root) // performing the inorder trace
         InOrderTrace(root->child[root->count]);
 }
 
-// merge function to merge the sorted halves
+// Merge function to merge the sorted halves
 void merge(int arr[], int l, int m, int r)
 {
     int i, j, k;
     int n1 = m - l + 1;
     int n2 = r - m;
 
-    /* create temp arrays */
-    int L[n1], R[n2];
+    /* Create temp arrays */
+    int *L = (int *)malloc(n1 * sizeof(int));
+    int *R = (int *)malloc(n2 * sizeof(int));
 
     /* Copy data to temp arrays L[] and R[] */
     for (i = 0; i < n1; i++)
@@ -190,7 +178,7 @@ void merge(int arr[], int l, int m, int r)
     for (j = 0; j < n2; j++)
         R[j] = arr[m + 1 + j];
 
-    /* Merge the temp arrays back into arr[l..r]*/
+    /* Merge the temp arrays back into arr[l..r] */
     i = 0; // Initial index of first subarray
     j = 0; // Initial index of second subarray
     k = l; // Initial index of merged subarray
@@ -224,6 +212,9 @@ void merge(int arr[], int l, int m, int r)
         j++;
         k++;
     }
+
+    free(L);
+    free(R);
 }
 
 // l is for left index and r is right index of the sub-array of arr to be sorted
@@ -256,7 +247,7 @@ int main()
     // creating the binary tree node
 
     root = insert1(root, 1);
-    // creating the root for binary tree
+    // creating thr root for binary tree
 
     if (file == NULL)
     {
@@ -268,10 +259,10 @@ int main()
 
     int N; // the size of the array in the file
     /* the inputs are taken in a file just to ensure that the set of numbers for both the exponential and the binary tree is same and
-    and also to perform the sorting, we need to store the elements in the array*/
+    and also to perform the quick sort, we need to store the elements in the array*/
 
     fscanf(file, "%d", &N);
-    // scanning the first number which is number of inputs for the array
+    // scannig the first number which is number of inputs for the array
 
     int k;
     e_time = clock(); // starting the clock to measure the time
@@ -294,19 +285,19 @@ int main()
     fclose(file); // closing the file
 
     FILE *file1; // opening the file
-    file1 = fopen("input.txt", "r"); // Ensure file1 is opened with the correct file
+    file1 = fopen("file1", "r");
     int N1;
     int k1;
     b_time = clock();         // opening the clock
     fscanf(file1, "%d", &N1); // scanning the first integer the size
 
-    for (int i = 0; i < N1; i++)
+    for (int i = 0; i < N; i++)
     {
         // reading the file
         fscanf(file1, "%d", &k1);
 
-        insert1(root, k1);
-        // inserting the data of file into the tree
+        insert1(root, k);
+        // inserting thr data of file int the tree
     }
 
     inorder(root);
@@ -317,13 +308,13 @@ int main()
 
     fclose(file1);
     // closing the file
-
     FILE *file2;
     file2 = fopen("input.txt", "r");
     // opening the file to scan
     int N2;
     fscanf(file2, "%d", &N2);
     // scanning the file
+    //  int arr[N2];
     int k2;
 
     m_time = clock();
@@ -335,18 +326,13 @@ int main()
         array[i] = k2;
     }
 
-    mergeSort(array, 0, N2 - 1); // performing the merge sort on input file
+    mergeSort(array, 0, N2 - 1); // performing the quicksort on input file
     m_time = clock() - m_time;
-    // stopping the clock
-    double merge_t = (double)m_time / CLOCKS_PER_SEC;
+    // stoping the clock
+    double mer_t = (double)m_time / CLOCKS_PER_SEC;
     printf("Expo_tree time is %f\n", exp_t);
-    // printing the time taken by exponential tree
     printf("Bin_tree time is %f\n", bst_t);
-    // printing the time of binary tree
-    printf("Merge_sort time is %f\n", merge_t);
-    // printing the time of merge sort algorithm
-    fclose(file2);
+    printf("Merge_sort time is %f\n", mer_t);
 
-    // closing the file at the end of the function
     return 0;
 }
