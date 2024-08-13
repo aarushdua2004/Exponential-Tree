@@ -326,7 +326,7 @@ int main()
         array[i] = k2;
     }
 
-    mergeSort(array, 0, N2 - 1); // performing the quicksort on input file
+    mergeSort(array, 0, N2 - 1); // performing the mergesort on input file
     m_time = clock() - m_time;
     // stoping the clock
     double mer_t = (double)m_time / CLOCKS_PER_SEC;
