@@ -35,6 +35,6 @@ The format of the input is as follows:
 * The first number of the file is the number of integers in the file.
 * The next is the N integers, that are taken as inputs and will be inserted in the trees.
 ## Output
-The output gives the CPU run-time to sort the integers by Exponential tree, Binary Tree and using Quick Sort algorithm.  
-The time taken by Exponential Tree Sorting and Quick Sort should be nearly same for smaller values of N.  
+The output gives the CPU run-time to sort the integers by Exponential tree, Binary Tree and using Merge Sort algorithm.  
+The time taken by Exponential Tree Sorting and Merge Sort should be nearly same for smaller values of N.  
 The run-time for Binary tree is always greater than the rest.
